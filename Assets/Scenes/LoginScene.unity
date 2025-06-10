@@ -2071,13 +2071,13 @@ MonoBehaviour:
   currentPlayer:
     playerId: Player
     playerName: Player
-    characterDescription: "\uC6A9\uAC10\uD55C \uBAA8\uD5D8\uAC00"
+    characterDescription: "\uC544\uB9C8 \uC6A9\uAC10\uD55C \uBAA8\uD5D8\uAC00"
     level: 1
     currentExp: 0
     maxExp: 100
     gold: 1000
     inventoryItemIds: 
-    equippedItemIds: 
+    equippedItemIds: 01000000
     baseAttack: 10
     baseDefense: 5
     baseHealth: 100
