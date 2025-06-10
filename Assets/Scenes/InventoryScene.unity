@@ -1237,6 +1237,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 774732910}
+  - component: {fileID: 774732911}
   m_Layer: 0
   m_Name: InventorySceneManager
   m_TagString: Untagged
@@ -1259,6 +1260,35 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &774732911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774732909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cce9b484d8bfbbd4d92323ffdafa9aa8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftPanel: {fileID: 2076125146}
+  rightPanel: {fileID: 1676865389}
+  inventoryWindow: {fileID: 1157326854}
+  statsWindow: {fileID: 1841410401}
+  playerNameText: {fileID: 0}
+  levelText: {fileID: 0}
+  expBar: {fileID: 0}
+  expText: {fileID: 0}
+  characterDescText: {fileID: 0}
+  goldText: {fileID: 0}
+  inventoryButton: {fileID: 0}
+  statsButton: {fileID: 0}
+  logoutButton: {fileID: 0}
+  inventoryCloseButton: {fileID: 0}
+  statsCloseButton: {fileID: 0}
+  inventoryUI: {fileID: 0}
+  statsUI: {fileID: 0}
 --- !u!1 &812329477
 GameObject:
   m_ObjectHideFlags: 0
@@ -2953,6 +2983,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1387069219}
+  - component: {fileID: 1387069220}
   m_Layer: 0
   m_Name: StatsUI
   m_TagString: Untagged
@@ -2975,6 +3006,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1387069220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1387069218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e21723818b00d3149859a71975f8393d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerNameText: {fileID: 0}
+  attackText: {fileID: 0}
+  defenseText: {fileID: 0}
+  healthText: {fileID: 0}
+  speedText: {fileID: 0}
+  equippedItemsText: {fileID: 0}
 --- !u!1 &1416924215
 GameObject:
   m_ObjectHideFlags: 0
@@ -3503,6 +3552,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1579614242}
+  - component: {fileID: 1579614243}
   m_Layer: 0
   m_Name: InventoryUI
   m_TagString: Untagged
@@ -3525,6 +3575,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1579614243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579614241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 025c269d239cce543ac11eb1034ece2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slotContainer: {fileID: 0}
+  itemSlotPrefab: {fileID: 0}
+  inventoryTitleText: {fileID: 0}
 --- !u!1 &1604267692
 GameObject:
   m_ObjectHideFlags: 0
