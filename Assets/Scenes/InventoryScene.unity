@@ -1276,19 +1276,19 @@ MonoBehaviour:
   rightPanel: {fileID: 1676865389}
   inventoryWindow: {fileID: 1157326854}
   statsWindow: {fileID: 1841410401}
-  playerNameText: {fileID: 0}
-  levelText: {fileID: 0}
-  expBar: {fileID: 0}
-  expText: {fileID: 0}
-  characterDescText: {fileID: 0}
-  goldText: {fileID: 0}
-  inventoryButton: {fileID: 0}
-  statsButton: {fileID: 0}
-  logoutButton: {fileID: 0}
-  inventoryCloseButton: {fileID: 0}
-  statsCloseButton: {fileID: 0}
-  inventoryUI: {fileID: 0}
-  statsUI: {fileID: 0}
+  playerNameText: {fileID: 1137112721}
+  levelText: {fileID: 912600776}
+  expBar: {fileID: 21381008}
+  expText: {fileID: 540865282}
+  characterDescText: {fileID: 1841869974}
+  goldText: {fileID: 106628550}
+  inventoryButton: {fileID: 1534377163}
+  statsButton: {fileID: 1683405421}
+  logoutButton: {fileID: 1865540700}
+  inventoryCloseButton: {fileID: 1604267694}
+  statsCloseButton: {fileID: 1156809107}
+  inventoryUI: {fileID: 1579614243}
+  statsUI: {fileID: 1387069220}
 --- !u!1 &812329477
 GameObject:
   m_ObjectHideFlags: 0
@@ -1738,7 +1738,6 @@ RectTransform:
   - {fileID: 674373191}
   - {fileID: 2097342803}
   - {fileID: 1433636379}
-  - {fileID: 1604267693}
   m_Father: {fileID: 1157326855}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -2767,6 +2766,7 @@ RectTransform:
   m_Children:
   - {fileID: 2076344232}
   - {fileID: 857882772}
+  - {fileID: 1604267693}
   m_Father: {fileID: 1256318168}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3018,12 +3018,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e21723818b00d3149859a71975f8393d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerNameText: {fileID: 0}
-  attackText: {fileID: 0}
-  defenseText: {fileID: 0}
-  healthText: {fileID: 0}
-  speedText: {fileID: 0}
-  equippedItemsText: {fileID: 0}
+  playerNameText: {fileID: 1470391619}
+  attackText: {fileID: 918649570}
+  defenseText: {fileID: 471824275}
+  healthText: {fileID: 1875639954}
+  speedText: {fileID: 899978419}
+  equippedItemsText: {fileID: 826528839}
 --- !u!1 &1416924215
 GameObject:
   m_ObjectHideFlags: 0
@@ -3587,9 +3587,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 025c269d239cce543ac11eb1034ece2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slotContainer: {fileID: 0}
-  itemSlotPrefab: {fileID: 0}
-  inventoryTitleText: {fileID: 0}
+  slotContainer: {fileID: 1563325862}
+  itemSlotPrefab: {fileID: 81646946402592194, guid: ab7d31be002819a4e86754d0d76c371b, type: 3}
+  inventoryTitleText: {fileID: 2097342804}
 --- !u!1 &1604267692
 GameObject:
   m_ObjectHideFlags: 0
@@ -3616,12 +3616,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1604267692}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 857882772}
+  m_Father: {fileID: 1157326855}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4295,8 +4295,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 381fda61ea0f06549990898b5b1e1dc3, type: 2}
+  m_sharedMaterial: {fileID: -3221098895872752926, guid: 381fda61ea0f06549990898b5b1e1dc3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

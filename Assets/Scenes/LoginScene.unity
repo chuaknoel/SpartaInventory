@@ -2082,7 +2082,13 @@ MonoBehaviour:
     baseDefense: 5
     baseHealth: 100
     baseSpeed: 10
-  itemDatabase: []
+  itemDatabase:
+  - itemId: 1
+    itemName: "\uAC80"
+    description: "\uCCA0 \uAC80"
+    itemType: 0
+    value: 0
+    iconSprite: {fileID: 21300000, guid: 4f2f320a217307a48a107491b1d17ebb, type: 3}
 --- !u!4 &1217454397
 Transform:
   m_ObjectHideFlags: 0
