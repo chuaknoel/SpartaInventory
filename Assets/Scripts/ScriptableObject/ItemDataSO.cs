@@ -32,6 +32,53 @@ public class ItemDataSO : ScriptableObject
     {
         // Inspector에서 수정할 때마다 설명 자동 업데이트
         UpdateFullDescription();
+        /// <summary>
+        /// 장착 가능한 아이템인지 확인
+        /// </summary>
+    }
+    public bool IsEquippable()
+    {
+        return itemType != ItemType.Consumable;
+    }
+
+    /// <summary>
+    /// 소비 가능한 아이템인지 확인
+    /// </summary>
+    public bool IsConsumable()
+    {
+        return itemType == ItemType.Consumable;
+    }
+
+    /// <summary>
+    /// 아이템 사용 (소비품용)
+    /// </summary>
+    public bool UseItem(PlayerData player)
+    {
+        if (!IsConsumable()) return false;
+
+        switch (itemName.ToLower())
+        {
+            case "체력물약":
+            case "hp포션":
+                // 체력 회복 로직 (나중에 PlayerStats 구현시)
+                Debug.Log($"{itemName} 사용: HP +{value}");
+                return true;
+
+            case "마나물약":
+            case "mp포션":
+                // 마나 회복 로직
+                Debug.Log($"{itemName} 사용: MP +{value}");
+                return true;
+
+            case "경험치물약":
+                player.currentExp += value;
+                Debug.Log($"{itemName} 사용: 경험치 +{value}");
+                return true;
+
+            default:
+                Debug.Log($"{itemName} 사용됨");
+                return true;
+        }
     }
 
     private void UpdateFullDescription()
@@ -64,14 +111,6 @@ public class ItemDataSO : ScriptableObject
             case ItemType.Consumable: return "소비품";
             default: return "기타";
         }
-    }
-
-    /// <summary>
-    /// 이 아이템이 장착 가능한지 확인
-    /// </summary>
-    public bool IsEquippable()
-    {
-        return itemType != ItemType.Consumable;
     }
 
     /// <summary>

@@ -3590,6 +3590,8 @@ MonoBehaviour:
   slotContainer: {fileID: 1563325862}
   itemSlotPrefab: {fileID: 81646946402592194, guid: ab7d31be002819a4e86754d0d76c371b, type: 3}
   inventoryTitleText: {fileID: 2097342804}
+  showEquippedItems: 1
+  showInventoryItems: 1
 --- !u!1 &1604267692
 GameObject:
   m_ObjectHideFlags: 0
