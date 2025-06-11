@@ -13,6 +13,7 @@ public class LoginSceneManager : MonoBehaviour
     [Header("Login Panel UI")]
     [SerializeField] private TMP_InputField playerNameInput;
     [SerializeField] private Button loginButton;
+    [SerializeField] private Button goToRegisterButton;
     [SerializeField] private TextMeshProUGUI statusText;
 
     [Header("Test Buttons")]
@@ -24,7 +25,7 @@ public class LoginSceneManager : MonoBehaviour
     {
         SetupUI();
         SetupButtons();
-        ShowLoginPanel(); // 시작할 때 로그인 패널 표시
+        ShowLoginPanel(); // 시작시 로그인 패널 표시
     }
 
     private void SetupUI()
@@ -51,6 +52,12 @@ public class LoginSceneManager : MonoBehaviour
         if (loginButton != null)
         {
             loginButton.onClick.AddListener(OnLoginButtonClicked);
+        }
+
+        // 회원가입으로 이동 버튼
+        if (goToRegisterButton != null)
+        {
+            goToRegisterButton.onClick.AddListener(ShowRegisterPanel);
         }
 
         // 테스트 버튼들
@@ -102,7 +109,7 @@ public class LoginSceneManager : MonoBehaviour
 
     #endregion
 
-    #region Login System
+    #region Login System (새로운 방식)
 
     /// <summary>
     /// 기존 플레이어로 로그인
@@ -111,9 +118,9 @@ public class LoginSceneManager : MonoBehaviour
     {
         ShowStatus("로그인 중...", Color.yellow);
 
-        if (DataManager.HasPlayerData(playerId))
+        if (PlayerDataManager.HasPlayerData(playerId))
         {
-            PlayerData playerData = DataManager.LoadPlayerData(playerId);
+            PlayerData playerData = PlayerDataManager.LoadPlayerData(playerId);
             if (playerData != null)
             {
                 // GameManager에 플레이어 설정
@@ -148,7 +155,7 @@ public class LoginSceneManager : MonoBehaviour
     {
         ShowStatus("등록 중...", Color.yellow);
 
-        if (DataManager.HasPlayerData(playerId))
+        if (PlayerDataManager.HasPlayerData(playerId))
         {
             ShowStatus("이미 존재하는 플레이어 ID입니다!", Color.red);
             return;
@@ -165,25 +172,30 @@ public class LoginSceneManager : MonoBehaviour
             // 새로운 플레이어 데이터 생성
             PlayerData newPlayer = new PlayerData(playerId, playerId);
 
-            // 테스트용 초기 아이템 추가
-            newPlayer.inventoryItemIds.Add(1); // 검
-            newPlayer.inventoryItemIds.Add(5); // 물약
+            // 시작 아이템 추가 (나중에 InventoryManager를 통해 처리 가능)
+            newPlayer.inventoryItemIds.Add(1); // 기본 무기
+            newPlayer.inventoryItemIds.Add(5); // 기본 물약
 
             // 데이터 저장
-            DataManager.SavePlayerData(newPlayer);
-
-            // GameManager에 플레이어 설정
-            if (GameManager.Instance != null)
+            if (PlayerDataManager.SavePlayerData(newPlayer))
             {
-                GameManager.Instance.SetCurrentPlayer(newPlayer);
-                ShowStatus($"{playerId} 등록 및 로그인 성공!", Color.green);
+                // GameManager에 플레이어 설정
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.SetCurrentPlayer(newPlayer);
+                    ShowStatus($"{playerId} 등록 및 로그인 성공!", Color.green);
 
-                // 잠시 기다린 후 인벤토리 씬으로 이동
-                Invoke(nameof(LoadInventoryScene), 1.0f);
+                    // 잠시 기다린 후 인벤토리 씬으로 이동
+                    Invoke(nameof(LoadInventoryScene), 1.0f);
+                }
+                else
+                {
+                    ShowStatus("GameManager를 찾을 수 없습니다!", Color.red);
+                }
             }
             else
             {
-                ShowStatus("GameManager를 찾을 수 없습니다!", Color.red);
+                ShowStatus("플레이어 데이터 저장에 실패했습니다!", Color.red);
             }
         }
         catch (System.Exception e)
@@ -222,46 +234,28 @@ public class LoginSceneManager : MonoBehaviour
             return;
         }
 
-        // 플레이어 생성 및 로그인
-        CreateAndLoginPlayer(playerName);
+        // 기존 플레이어 체크 후 로그인 또는 생성
+        if (PlayerDataManager.HasPlayerData(playerName))
+        {
+            Login(playerName);
+        }
+        else
+        {
+            Register(playerName);
+        }
     }
 
     private void CreateTestPlayer(string testName)
     {
-        CreateAndLoginPlayer(testName);
-    }
-
-    private void CreateAndLoginPlayer(string playerName)
-    {
-        ShowStatus("로그인 중...", Color.yellow);
-
-        try
+        if (PlayerDataManager.HasPlayerData(testName))
         {
-            // 새로운 플레이어 데이터 생성
-            PlayerData newPlayer = new PlayerData(playerName);
-
-            // 테스트용 초기 아이템 추가
-            newPlayer.inventoryItemIds.Add(1); // 검
-            newPlayer.inventoryItemIds.Add(5); // 물약
-
-            // GameManager에 플레이어 설정
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.SetCurrentPlayer(newPlayer);
-                ShowStatus($"{playerName}으로 로그인 성공!", Color.green);
-
-                // 잠시 기다린 후 인벤토리 씬으로 이동
-                Invoke(nameof(LoadInventoryScene), 1.0f);
-            }
-            else
-            {
-                ShowStatus("GameManager를 찾을 수 없습니다!", Color.red);
-            }
+            // 이미 존재하면 로그인
+            Login(testName);
         }
-        catch (System.Exception e)
+        else
         {
-            ShowStatus($"로그인 실패: {e.Message}", Color.red);
-            Debug.LogError($"로그인 오류: {e}");
+            // 없으면 새로 생성
+            Register(testName);
         }
     }
 
@@ -279,11 +273,11 @@ public class LoginSceneManager : MonoBehaviour
 
     private void ShowStatus(string message, Color color)
     {
-        if (statusText != null)
-        {
-            statusText.text = message;
-            statusText.color = color;
-        }
+        //if (statusText != null)
+        //{
+        //    statusText.text = message;
+        //    statusText.color = color;
+        //}
 
         Debug.Log($"LoginScene: {message}");
     }
@@ -324,12 +318,30 @@ public class LoginSceneManager : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
-            Debug.Log("GameManager 정상 작동 중");
+            Debug.Log("GameManager 정상 작동");
+            Debug.Log($"현재 플레이어: {(GameManager.Instance.HasCurrentPlayer ? GameManager.Instance.CurrentPlayer.playerName : "없음")}");
         }
         else
         {
             Debug.LogWarning("GameManager가 없습니다!");
         }
+    }
+
+    [ContextMenu("저장된 플레이어 목록")]
+    private void ShowSavedPlayers()
+    {
+        var playerIds = PlayerDataManager.GetAllPlayerIds();
+        Debug.Log($"저장된 플레이어 ({playerIds.Count}명):");
+        foreach (string id in playerIds)
+        {
+            Debug.Log($"  - {id}");
+        }
+    }
+
+    [ContextMenu("저장 폴더 열기")]
+    private void OpenSaveFolder()
+    {
+        PlayerDataManager.OpenSaveFolder();
     }
 
     #endregion

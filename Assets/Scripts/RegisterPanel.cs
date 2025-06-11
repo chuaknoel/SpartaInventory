@@ -76,8 +76,8 @@ public class RegisterPanel : MonoBehaviour
             return;
         }
 
-        // 데이터 존재 여부 확인 후 등록
-        if (DataManager.HasPlayerData(playerId))
+        // PlayerDataManager를 사용하여 데이터 존재 여부 확인 후 등록
+        if (PlayerDataManager.HasPlayerData(playerId))
         {
             Debug.Log("이미 존재하는 플레이어입니다. 다른 ID를 사용해주세요.");
         }

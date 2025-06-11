@@ -70,8 +70,8 @@ public class LoginPanel : MonoBehaviour
             return;
         }
 
-        // 데이터 존재 여부 확인 후 로그인
-        if (DataManager.HasPlayerData(playerId))
+        // PlayerDataManager를 사용하여 데이터 존재 여부 확인 후 로그인
+        if (PlayerDataManager.HasPlayerData(playerId))
         {
             sceneManager.Login(playerId);
         }

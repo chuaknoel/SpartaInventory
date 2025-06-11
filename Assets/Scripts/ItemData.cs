@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// 아이템 타입 열거형
+// 아이템 타입 열거형 (공통 사용)
 [System.Serializable]
 public enum ItemType
 {
@@ -13,7 +13,8 @@ public enum ItemType
     Consumable   // 소비품
 }
 
-// 아이템 데이터 클래스
+// 기존 ItemData 클래스 (호환성을 위해 유지하지만 사용 권장하지 않음)
+// 새로운 시스템에서는 ItemDataSO를 사용하세요
 [System.Serializable]
 public class ItemData
 {
@@ -44,5 +45,20 @@ public class ItemData
         itemType = ItemType.Consumable;
         value = 0;
         iconSprite = null;
+    }
+
+    /// <summary>
+    /// ItemDataSO로 변환 (호환성을 위함)
+    /// </summary>
+    public ItemDataSO ToItemDataSO()
+    {
+        var so = ScriptableObject.CreateInstance<ItemDataSO>();
+        so.itemId = this.itemId;
+        so.itemName = this.itemName;
+        so.description = this.description;
+        so.itemType = this.itemType;
+        so.value = this.value;
+        so.iconSprite = this.iconSprite;
+        return so;
     }
 }

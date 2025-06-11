@@ -1391,8 +1391,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loginPanel: {fileID: 1657980215}
   registerPanel: {fileID: 499785150}
-  playerNameInput: {fileID: 0}
-  loginButton: {fileID: 0}
+  playerNameInput: {fileID: 1849128019}
+  loginButton: {fileID: 213609615}
+  goToRegisterButton: {fileID: 245812212}
   statusText: {fileID: 0}
   testButton1: {fileID: 0}
   testButton2: {fileID: 0}
@@ -2077,18 +2078,14 @@ MonoBehaviour:
     maxExp: 100
     gold: 1000
     inventoryItemIds: 
-    equippedItemIds: 01000000
+    equippedItemIds: 
     baseAttack: 10
     baseDefense: 5
     baseHealth: 100
     baseSpeed: 10
-  itemDatabase:
-  - itemId: 1
-    itemName: "\uAC80"
-    description: "\uCCA0 \uAC80"
-    itemType: 0
-    value: 0
-    iconSprite: {fileID: 21300000, guid: 4f2f320a217307a48a107491b1d17ebb, type: 3}
+  loginSceneName: LoginScene
+  inventorySceneName: InventoryScene
+  showDebugLogs: 1
 --- !u!4 &1217454397
 Transform:
   m_ObjectHideFlags: 0

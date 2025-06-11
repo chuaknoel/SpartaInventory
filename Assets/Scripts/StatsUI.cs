@@ -15,29 +15,61 @@ public class StatsUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI speedText;
     [SerializeField] private TextMeshProUGUI equippedItemsText;
 
+    private void OnEnable()
+    {
+        // GameManager와 InventoryManager 이벤트 구독
+        GameManager.OnPlayerChanged += OnPlayerChanged;
+        GameManager.OnPlayerDataUpdated += RefreshStats;
+        InventoryManager.OnEquipmentChanged += RefreshStats;
+    }
+
+    private void OnDisable()
+    {
+        // 이벤트 구독 해제
+        GameManager.OnPlayerChanged -= OnPlayerChanged;
+        GameManager.OnPlayerDataUpdated -= RefreshStats;
+        InventoryManager.OnEquipmentChanged -= RefreshStats;
+    }
+
+    private void OnPlayerChanged(PlayerData newPlayer)
+    {
+        RefreshStats();
+    }
+
     public void RefreshStats()
     {
-        if (GameManager.Instance == null || GameManager.Instance.currentPlayer == null)
+        if (GameManager.Instance?.CurrentPlayer == null)
         {
             Debug.LogWarning("플레이어 데이터가 없어서 스탯을 새로고침할 수 없습니다.");
+            ClearStats();
             return;
         }
 
-        PlayerData player = GameManager.Instance.currentPlayer;
-        PlayerStats stats = GameManager.Instance.GetCalculatedStats();
+        PlayerData player = GameManager.Instance.CurrentPlayer;
+        PlayerStats stats = GameManager.Instance.GetPlayerTotalStats();
 
         UpdatePlayerInfo(player);
         UpdateStatsInfo(stats);
-        UpdateEquippedItemsInfo(player.equippedItemIds);
+        UpdateEquippedItemsInfo();
 
         Debug.Log("스탯 UI 새로고침 완료");
+    }
+
+    private void ClearStats()
+    {
+        if (playerNameText != null) playerNameText.text = "플레이어 없음";
+        if (attackText != null) attackText.text = "공격력: 0";
+        if (defenseText != null) defenseText.text = "방어력: 0";
+        if (healthText != null) healthText.text = "체력: 0";
+        if (speedText != null) speedText.text = "속도: 0";
+        if (equippedItemsText != null) equippedItemsText.text = "장착한 아이템: 없음";
     }
 
     private void UpdatePlayerInfo(PlayerData player)
     {
         if (playerNameText != null)
         {
-            playerNameText.text = $"{player.playerName}의 스탯";
+            playerNameText.text = $"{player.playerName}의 스탯 (레벨 {player.level})";
         }
     }
 
@@ -48,7 +80,7 @@ public class StatsUI : MonoBehaviour
         {
             if (stats.bonusAttack > 0)
             {
-                attackText.text = $"공격력: {stats.baseAttack} + {stats.bonusAttack} = <color=green>{stats.TotalAttack}</color>";
+                attackText.text = $"공격력: {stats.baseAttack} + <color=green>{stats.bonusAttack}</color> = <color=yellow>{stats.TotalAttack}</color>";
             }
             else
             {
@@ -61,7 +93,7 @@ public class StatsUI : MonoBehaviour
         {
             if (stats.bonusDefense > 0)
             {
-                defenseText.text = $"방어력: {stats.baseDefense} + {stats.bonusDefense} = <color=green>{stats.TotalDefense}</color>";
+                defenseText.text = $"방어력: {stats.baseDefense} + <color=green>{stats.bonusDefense}</color> = <color=yellow>{stats.TotalDefense}</color>";
             }
             else
             {
@@ -72,19 +104,41 @@ public class StatsUI : MonoBehaviour
         // 체력
         if (healthText != null)
         {
-            healthText.text = $"체력: {stats.TotalHealth}";
+            if (stats.bonusHealth > 0)
+            {
+                healthText.text = $"체력: {stats.baseHealth} + <color=green>{stats.bonusHealth}</color> = <color=yellow>{stats.TotalHealth}</color>";
+            }
+            else
+            {
+                healthText.text = $"체력: {stats.TotalHealth}";
+            }
         }
 
         // 속도
         if (speedText != null)
         {
-            speedText.text = $"속도: {stats.TotalSpeed}";
+            if (stats.bonusSpeed > 0)
+            {
+                speedText.text = $"속도: {stats.baseSpeed} + <color=green>{stats.bonusSpeed}</color> = <color=yellow>{stats.TotalSpeed}</color>";
+            }
+            else
+            {
+                speedText.text = $"속도: {stats.TotalSpeed}";
+            }
         }
     }
 
-    private void UpdateEquippedItemsInfo(List<int> equippedItemIds)
+    private void UpdateEquippedItemsInfo()
     {
         if (equippedItemsText == null) return;
+
+        if (InventoryManager.Instance == null)
+        {
+            equippedItemsText.text = "장착한 아이템: 시스템 오류";
+            return;
+        }
+
+        List<int> equippedItemIds = InventoryManager.Instance.GetEquippedItemIds();
 
         if (equippedItemIds.Count == 0)
         {
@@ -96,16 +150,16 @@ public class StatsUI : MonoBehaviour
         sb.AppendLine("장착한 아이템:");
 
         // 아이템 타입별로 분류해서 표시
-        Dictionary<ItemType, List<ItemData>> equippedByType = new Dictionary<ItemType, List<ItemData>>();
+        Dictionary<ItemType, List<ItemDataSO>> equippedByType = new Dictionary<ItemType, List<ItemDataSO>>();
 
         foreach (int itemId in equippedItemIds)
         {
-            ItemData item = GameManager.Instance.GetItemData(itemId);
+            ItemDataSO item = InventoryManager.Instance.GetItemData(itemId);
             if (item != null)
             {
                 if (!equippedByType.ContainsKey(item.itemType))
                 {
-                    equippedByType[item.itemType] = new List<ItemData>();
+                    equippedByType[item.itemType] = new List<ItemDataSO>();
                 }
                 equippedByType[item.itemType].Add(item);
             }
@@ -117,7 +171,7 @@ public class StatsUI : MonoBehaviour
             string typeColor = GetItemTypeColorString(kvp.Key);
             sb.AppendLine($"<color={typeColor}>[{GetItemTypeDisplayName(kvp.Key)}]</color>");
 
-            foreach (ItemData item in kvp.Value)
+            foreach (ItemDataSO item in kvp.Value)
             {
                 sb.AppendLine($"  • {item.itemName} (+{item.value})");
             }
@@ -160,11 +214,13 @@ public class StatsUI : MonoBehaviour
 
     public void ShowDetailedStats()
     {
-        if (GameManager.Instance?.currentPlayer == null) return;
+        if (GameManager.Instance?.CurrentPlayer == null) return;
 
-        PlayerStats stats = GameManager.Instance.GetCalculatedStats();
+        PlayerStats stats = GameManager.Instance.GetPlayerTotalStats();
+        PlayerData player = GameManager.Instance.CurrentPlayer;
 
         Debug.Log("=== 상세 스탯 정보 ===");
+        Debug.Log($"플레이어: {player.playerName} (레벨 {player.level})");
         Debug.Log($"기본 공격력: {stats.baseAttack}");
         Debug.Log($"장비 보너스 공격력: +{stats.bonusAttack}");
         Debug.Log($"총 공격력: {stats.TotalAttack}");
@@ -173,6 +229,55 @@ public class StatsUI : MonoBehaviour
         Debug.Log($"총 방어력: {stats.TotalDefense}");
         Debug.Log($"체력: {stats.TotalHealth}");
         Debug.Log($"속도: {stats.TotalSpeed}");
+
+        // 장착된 아이템 상세 정보
+        if (InventoryManager.Instance != null)
+        {
+            var equippedIds = InventoryManager.Instance.GetEquippedItemIds();
+            Debug.Log($"장착된 아이템 ({equippedIds.Count}개):");
+            foreach (int itemId in equippedIds)
+            {
+                ItemDataSO item = InventoryManager.Instance.GetItemData(itemId);
+                if (item != null)
+                {
+                    Debug.Log($"  - {item.itemName} ({item.itemType}, +{item.value})");
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region Level Up Effect (미래 확장용)
+
+    /// <summary>
+    /// 레벨업시 시각 효과
+    /// </summary>
+    public void PlayLevelUpEffect()
+    {
+        // TODO: 레벨업 파티클 효과, 사운드 등
+        Debug.Log("레벨업 효과 재생!");
+
+        // 간단한 텍스트 깜빡임 효과
+        if (playerNameText != null)
+        {
+            StartCoroutine(BlinkText(playerNameText, Color.yellow, 1.0f));
+        }
+    }
+
+    private System.Collections.IEnumerator BlinkText(TextMeshProUGUI text, Color blinkColor, float duration)
+    {
+        Color originalColor = text.color;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            text.color = Color.Lerp(originalColor, blinkColor, Mathf.PingPong(elapsed * 4, 1));
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        text.color = originalColor;
     }
 
     #endregion
@@ -194,15 +299,30 @@ public class StatsUI : MonoBehaviour
     [ContextMenu("레벨업 테스트")]
     public void TestLevelUp()
     {
-        if (GameManager.Instance?.currentPlayer != null)
+        if (GameManager.Instance?.CurrentPlayer != null)
         {
-            GameManager.Instance.currentPlayer.level++;
-            GameManager.Instance.currentPlayer.currentExp = 0;
-            GameManager.Instance.currentPlayer.maxExp += 100;
+            PlayerData player = GameManager.Instance.CurrentPlayer;
+            player.level++;
+            player.currentExp = 0;
+            player.maxExp += 100;
 
-            RefreshStats();
-            Debug.Log("레벨업!");
+            // 기본 스탯 증가
+            player.baseAttack += 3;
+            player.baseDefense += 2;
+            player.baseHealth += 15;
+            player.baseSpeed += 1;
+
+            GameManager.Instance.NotifyPlayerDataChanged();
+            PlayLevelUpEffect();
+
+            Debug.Log($"{player.playerName}이(가) 레벨 {player.level}이 되었습니다!");
         }
+    }
+
+    [ContextMenu("레벨업 효과 테스트")]
+    public void TestLevelUpEffect()
+    {
+        PlayLevelUpEffect();
     }
 
     #endregion

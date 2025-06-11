@@ -42,25 +42,41 @@ public class InventorySceneManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // GameManager 이벤트 구독
-        GameManager.OnPlayerDataChanged += UpdatePlayerInfo;
-        GameManager.OnInventoryChanged += UpdatePlayerInfo;
+        // 새로운 GameManager 이벤트 구독
+        GameManager.OnPlayerChanged += OnPlayerChanged;
+        GameManager.OnPlayerDataUpdated += UpdatePlayerInfo;
+
+        // InventoryManager 이벤트 구독 (있다면)
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.OnInventoryChanged += UpdatePlayerInfo;
+        }
     }
 
     private void OnDisable()
     {
-        // GameManager 이벤트 구독 해제
-        GameManager.OnPlayerDataChanged -= UpdatePlayerInfo;
-        GameManager.OnInventoryChanged -= UpdatePlayerInfo;
+        // 이벤트 구독 해제
+        GameManager.OnPlayerChanged -= OnPlayerChanged;
+        GameManager.OnPlayerDataUpdated -= UpdatePlayerInfo;
+
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.OnInventoryChanged -= UpdatePlayerInfo;
+        }
+    }
+
+    private void OnPlayerChanged(PlayerData newPlayer)
+    {
+        UpdatePlayerInfo();
     }
 
     private void InitializeUI()
     {
-        // 처음에는 메인 허브만 표시
+        // 처음에는 메인 패널만 표시
         ShowMainHub();
 
         // GameManager가 없으면 로그인 씬으로
-        if (GameManager.Instance == null || GameManager.Instance.currentPlayer == null)
+        if (GameManager.Instance == null || !GameManager.Instance.HasCurrentPlayer)
         {
             Debug.LogWarning("플레이어 데이터가 없습니다. 로그인 씬으로 돌아갑니다.");
             GameManager.Instance?.LoadLoginScene();
@@ -98,7 +114,10 @@ public class InventorySceneManager : MonoBehaviour
         statsWindow.SetActive(false);
 
         // 인벤토리 UI 새로고침
-        inventoryUI.RefreshInventory();
+        if (inventoryUI != null)
+        {
+            inventoryUI.RefreshInventory();
+        }
     }
 
     private void CloseInventory()
@@ -114,7 +133,10 @@ public class InventorySceneManager : MonoBehaviour
         statsWindow.SetActive(true);
 
         // 스탯 UI 새로고침
-        statsUI.RefreshStats();
+        if (statsUI != null)
+        {
+            statsUI.RefreshStats();
+        }
     }
 
     private void CloseStats()
@@ -124,6 +146,8 @@ public class InventorySceneManager : MonoBehaviour
 
     private void Logout()
     {
+        // 플레이어 데이터 저장 후 로그아웃
+        GameManager.Instance.SaveCurrentPlayer();
         GameManager.Instance.LoadLoginScene();
     }
 
@@ -133,21 +157,28 @@ public class InventorySceneManager : MonoBehaviour
 
     private void UpdatePlayerInfo()
     {
-        if (GameManager.Instance == null || GameManager.Instance.currentPlayer == null)
+        if (GameManager.Instance == null || !GameManager.Instance.HasCurrentPlayer)
             return;
 
-        PlayerData player = GameManager.Instance.currentPlayer;
+        PlayerData player = GameManager.Instance.CurrentPlayer; // public 프로퍼티 사용
 
         // 플레이어 기본 정보
-        playerNameText.text = $"Player: {player.playerName}";
-        levelText.text = $"Level: {player.level}";
-        characterDescText.text = player.characterDescription;
-        goldText.text = $"Gold: {player.gold:N0}";
+        if (playerNameText != null)
+            playerNameText.text = $"Player: {player.playerName}";
+        if (levelText != null)
+            levelText.text = $"Level: {player.level}";
+        if (characterDescText != null)
+            characterDescText.text = player.characterDescription;
+        if (goldText != null)
+            goldText.text = $"Gold: {player.gold:N0}";
 
         // 경험치 바
-        float expProgress = (float)player.currentExp / player.maxExp;
-        expBar.value = expProgress;
-        expText.text = $"{player.currentExp}/{player.maxExp}";
+        if (expBar != null && expText != null)
+        {
+            float expProgress = (float)player.currentExp / player.maxExp;
+            expBar.value = expProgress;
+            expText.text = $"{player.currentExp}/{player.maxExp}";
+        }
     }
 
     #endregion
@@ -157,27 +188,53 @@ public class InventorySceneManager : MonoBehaviour
     [ContextMenu("테스트 아이템 추가")]
     private void AddTestItems()
     {
-        if (GameManager.Instance == null) return;
+        if (InventoryManager.Instance == null)
+        {
+            Debug.LogWarning("InventoryManager가 없습니다!");
+            return;
+        }
 
-        // 테스트용 아이템들 추가
-        GameManager.Instance.AddItemToInventory(1); // 검
-        GameManager.Instance.AddItemToInventory(2); // 방패
-        GameManager.Instance.AddItemToInventory(3); // 투구
-        GameManager.Instance.AddItemToInventory(4); // 갑옷
-        GameManager.Instance.AddItemToInventory(5); // 물약
-        GameManager.Instance.AddItemToInventory(6); // 마나물약
-
+        // InventoryManager를 통해 아이템 추가
+        InventoryManager.Instance.AddTestItems();
         Debug.Log("테스트 아이템들이 추가되었습니다!");
     }
 
     [ContextMenu("골드 추가")]
     private void AddTestGold()
     {
-        if (GameManager.Instance?.currentPlayer != null)
+        if (GameManager.Instance?.CurrentPlayer != null)
         {
-            GameManager.Instance.currentPlayer.gold += 1000;
-            UpdatePlayerInfo();
+            GameManager.Instance.CurrentPlayer.gold += 1000;
+            GameManager.Instance.NotifyPlayerDataChanged();
             Debug.Log("골드 1000 추가!");
+        }
+    }
+
+    [ContextMenu("레벨업 테스트")]
+    private void TestLevelUp()
+    {
+        if (GameManager.Instance?.CurrentPlayer != null)
+        {
+            PlayerData player = GameManager.Instance.CurrentPlayer;
+            player.level++;
+            player.currentExp = 0;
+            player.maxExp += 50;
+
+            GameManager.Instance.NotifyPlayerDataChanged();
+            Debug.Log($"{player.playerName}이(가) 레벨 {player.level}이 되었습니다!");
+        }
+    }
+
+    [ContextMenu("데이터 저장 테스트")]
+    private void TestSaveData()
+    {
+        if (GameManager.Instance.SaveCurrentPlayer())
+        {
+            Debug.Log("플레이어 데이터 저장 완료!");
+        }
+        else
+        {
+            Debug.Log("플레이어 데이터 저장 실패!");
         }
     }
 
